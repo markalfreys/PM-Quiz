@@ -173,7 +173,7 @@
     .hero-logos img:nth-child(4) {
         width: 100%;
     }
-    .quiz-card{
+    .quiz-card, .watch-card{
         padding: 30px 20px 20px;
     }
     .result-img{
