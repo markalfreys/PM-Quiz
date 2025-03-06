@@ -163,7 +163,7 @@ const qacont = document.getElementById('qa-cont')
 const qa = document.getElementById('qa')
 qa.remove()
 
-var quizPrimeQuestion, quizSubQuestion, quizAnswer, quizProgress, quizNumber, qprev, qnext, qsubmit;
+var quizPrimeQuestion, quizSubQuestion, quizAnswer, quizProgress, quizNumber, qprev, qnext, qsubmit, progressText, progressCircle;
 
 femalegender.addEventListener('change', (e) => toggleG(e))
 malegender.addEventListener('change', (e) => toggleG(e))
@@ -189,6 +189,9 @@ function toggleG(e) {
     if(e.target.value !== selectedGTemp) {
         currentQuestionIndex = 0
         answers = []
+        progressText.innerHTML = '0<span>%</span>';
+        progressCircle.style.strokeDasharray = `${2 * Math.PI * 100}`;
+
         loadQuestion(currentQuestionIndex) 
     }
 
@@ -207,6 +210,8 @@ function displayQA() {
         qprev = document.querySelector(".quiz-btn-ctrl.prev").addEventListener("click", () => handleNextPrevQ(-1));
         qnext = document.querySelector(".quiz-btn-ctrl.next").addEventListener("click", () => handleNextPrevQ(1));
         qsubmit = document.querySelector('.quiz-submit-btn')
+        progressText = document.querySelector('.progress-text p');
+        progressCircle = document.querySelector(".circular-progress .fg");
     } 
 }
 
@@ -225,22 +230,13 @@ function loadQuestion(n = 0) {
 
     quizPrimeQuestion.innerHTML = selectedQAData.q
     quizSubQuestion.innerHTML = selectedQAData.subq
-
-    let questionStr = ""
-    let checked;
     
-    for (let i = 0; i < selectedQAData.a.length ; i++) {
-        checked = answers[n] === selectedQAData.a[i].value ? "checked" : "";
-     
-        questionStr += `<label class="quiz-button">
-                            <input type="radio" name="answer" class="answer" value="${selectedQAData.a[i].value}" ${checked}>
-                            <span class="quiz-btn-text">${selectedQAData.a[i].text}</span>
-                         </label>`
-    }
-
+    quizAnswer.innerHTML = "";
+    selectedQAData.a.forEach(answer => {
+        quizAnswer.appendChild(generateInputEl(answer, n));
+    })
+    
     quizNumber.innerHTML = (n+1)+'/'+qaDataTemp.length
-
-    quizAnswer.innerHTML = questionStr
 
     // add change listener to answer, and update the variable that holds the answers
     document.querySelectorAll('.answer').forEach(input => {
@@ -253,6 +249,29 @@ function loadQuestion(n = 0) {
     });
 
     updateButtonState()
+}
+
+function generateInputEl(answer, n) {
+    let label = document.createElement("label");
+    label.className = "quiz-button";
+
+    let input = document.createElement("input");
+    input.type = "radio";
+    input.name = "answer";
+    input.className = "answer";
+    input.value = answer.value;
+    if (answers[n] === answer.value) {
+        input.setAttribute("checked", "checked");
+    }
+
+    let span = document.createElement("span");
+    span.className = "quiz-btn-text";
+    span.textContent = answer.text;
+
+    label.appendChild(input);
+    label.appendChild(span);
+
+    return label;
 }
 
 // Function the handles the Next and Prev question button
@@ -317,18 +336,28 @@ function allQuestionsAnswered() {
 
 // change the number inside the result circle
 function animateProgressText() {
-    const progressText = document.querySelector('.progress-text p');
+
     let startTime = Date.now();
     let duration = 3000; 
     let finalValue = Math.floor(Math.random() * (100 - 85) + 85); 
     
+
+    let circumference = 2 * Math.PI * 90; 
+
+
     function updateProgress() {
         let elapsedTime = Date.now() - startTime;
-        
-        if (elapsedTime < duration) {
-            let randomValue = Math.floor(Math.random() * 100); 
-            progressText.innerHTML = `${randomValue}<span>%</span>`;
-            setTimeout(updateProgress, 50);
+
+        let progress = Math.min(elapsedTime / duration, 1);
+        let currentValue = Math.floor(progress * finalValue);
+        let dashValue = (currentValue / 100) * circumference;
+
+        progressText.innerHTML = `${currentValue}<span>%</span>`;
+
+        progressCircle.style.strokeDasharray = `${dashValue} ${circumference}`;
+
+        if (progress < 1) {
+            requestAnimationFrame(updateProgress);
         } else {
             progressText.innerHTML = `${finalValue}<span>%</span>`; 
         }
