@@ -159,14 +159,44 @@ const qaData = {
 
 const femalegender = document.getElementById('femalegender')
 const malegender = document.getElementById('malegender')
-const qacont = document.getElementById('qa-cont')
-const qa = document.getElementById('qa')
-qa.remove()
+const heroSection = document.getElementsByClassName('hero')[0]
+const quizSection = document.getElementsByClassName('quiz')[0]
+const resultSection = document.getElementsByClassName('result')[0]
+const watchSection = document.getElementsByClassName('watch')[0]
+const main = document.getElementsByClassName('main')[0]
+quizSection.remove()
+resultSection.remove()
+watchSection.remove()
 
 var quizPrimeQuestion, quizSubQuestion, quizAnswer, quizProgress, quizNumber, qprev, qnext, qsubmit, progressText, progressCircle;
 
-femalegender.addEventListener('change', (e) => toggleG(e))
-malegender.addEventListener('change', (e) => toggleG(e))
+femalegender.addEventListener('click', () => start('female'));
+malegender.addEventListener('click', () => start('male'));
+
+
+function start(g){ 
+    showNextSection('120vh')
+    toggleG(g)
+}
+
+const sections = [heroSection, quizSection, resultSection, watchSection]
+
+var current = 0
+function showNextSection(h = '110vh') {
+    var currentTemp = current+1
+
+    if(currentTemp >= sections.length) return;
+
+    main.appendChild(sections[currentTemp]);
+    sections[current].style.minHeight = h
+    sections[current].style.marginTop = '-'+sections[current].style.minHeight
+    setTimeout(() => {
+        sections[current].remove()
+        current = currentTemp
+    }, 1000);
+}
+
+
 
 
 var selectedG = null;
@@ -178,30 +208,15 @@ var answers = []
 function toggleG(e) {
 
     displayQA()
+    selectedG = e === 'female' ? 'female' : 'male' ;
     
-    let selectedGTemp = selectedG;
-    if(e.target.value === 'female'){
-        selectedG = 'female'
-    }else{
-        selectedG = 'male'   
-    }
-    
-    if(e.target.value !== selectedGTemp) {
-        currentQuestionIndex = 0
-        answers = []
-        progressText.innerHTML = '0<span>%</span>';
-        progressCircle.style.strokeDasharray = `${2 * Math.PI * 100}`;
-
-        loadQuestion(currentQuestionIndex) 
-    }
+    loadQuestion(currentQuestionIndex) 
 
 }
 
 // display the cards, result and the watch section if user selecte what gender.
 function displayQA() {
     if(!selectedG){
-        qacont.appendChild(qa);
-        qa.style.display = 'block';
         quizPrimeQuestion= document.getElementById('quiz-question-main')
         quizSubQuestion = document.getElementById('quiz-question-sub')
         quizAnswer = document.querySelector('.quiz-answer')
@@ -210,8 +225,7 @@ function displayQA() {
         qprev = document.querySelector(".quiz-btn-ctrl.prev").addEventListener("click", () => handleNextPrevQ(-1));
         qnext = document.querySelector(".quiz-btn-ctrl.next").addEventListener("click", () => handleNextPrevQ(1));
         qsubmit = document.querySelector('.quiz-submit-btn')
-        progressText = document.querySelector('.progress-text p');
-        progressCircle = document.querySelector(".circular-progress .fg");
+        
     } 
 }
 
@@ -244,6 +258,8 @@ function loadQuestion(n = 0) {
             answers[currentQuestionIndex] = e.target.value;
             if(currentQuestionIndex+1 === qaDataTemp.length){
                 updateButtonState()
+            }else{
+                handleNextPrevQ(1)
             }
         });
     });
@@ -311,13 +327,15 @@ function updateButtonState() {
 
     // if last question, remove the Next and replace submit
     if (currentQuestionIndex === qaDataTemp.length - 1) {
-        nextBtn.style.display = "none"; // Hide Next button
-        submitBtn.style.display = "block"; // Show Submit button
+       // nextBtn.style.display = "none"; // Hide Next button
+        //submitBtn.style.display = "block"; // Show Submit button
 
         if (allQuestionsAnswered()) {
-            submitBtn.onclick = () => scrollToResultSection(animateProgressText);; // Attach event if all questions are answered
-            submitBtn.disabled = false;
-            submitBtn.style.opacity = "1";
+            //submitBtn.onclick = () => scrollToResultSection(); // Attach event if all questions are answered
+            //submitBtn.disabled = false;
+            //submitBtn.style.opacity = "1";
+            scrollToResultSection()
+
         } else {
             submitBtn.onclick = null;
             submitBtn.disabled = true;
@@ -325,7 +343,7 @@ function updateButtonState() {
         }
     } else {
         nextBtn.style.display = "block";
-        submitBtn.style.display = "none";
+        //submitBtn.style.display = "none";
     }
 }
 
@@ -336,13 +354,14 @@ function allQuestionsAnswered() {
 
 // change the number inside the result circle
 function animateProgressText() {
+    progressText = document.querySelector('.progress-text p');
+    progressCircle = document.querySelector(".circleblue");
 
     let startTime = Date.now();
     let duration = 3000; 
     let finalValue = Math.floor(Math.random() * (100 - 85) + 85); 
     
 
-    let circumference = 2 * Math.PI * 90; 
 
 
     function updateProgress() {
@@ -350,16 +369,18 @@ function animateProgressText() {
 
         let progress = Math.min(elapsedTime / duration, 1);
         let currentValue = Math.floor(progress * finalValue);
-        let dashValue = (currentValue / 100) * circumference;
 
         progressText.innerHTML = `${currentValue}<span>%</span>`;
-
-        progressCircle.style.strokeDasharray = `${dashValue} ${circumference}`;
+        progressCircle.classList.add('animateRotate')
 
         if (progress < 1) {
             requestAnimationFrame(updateProgress);
         } else {
             progressText.innerHTML = `${finalValue}<span>%</span>`; 
+            setTimeout(() => {
+                showNextSection()
+            }, 500)
+
         }
     }
 
@@ -373,11 +394,6 @@ function onQuizComplete() {
 
 // If user submit the button, the screen will scroll to result section
 function scrollToResultSection(callback) {
-    const resultSection = document.querySelector(".result .text-section");
-    if (resultSection) {
-        resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
-        setTimeout(callback, 500); 
-    } else {
-        callback(); 
-    }
+    showNextSection()
+    animateProgressText()
 }
