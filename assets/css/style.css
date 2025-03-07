@@ -1,6 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Encode+Sans+Condensed:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
+:root{
+    --primary: #E9639F;
+    --secondary: #8143E2;
+    --dark: #1E1E1E
+}
+
+
 *{
     margin: 0;
     padding: 0;
@@ -14,24 +21,28 @@ body {
     margin: 0;
     font-family: Jost;
     font-weight: normal;
-    /* background: url(../img/bg.png) no-repeat center / cover; */
     color: #000;
-    /* background-position: top left; */
-    /* background-size: 150%; */
     height: 100%;
     width: 100%;
     overflow-x: hidden;
-
+    min-height: 100vh;
+    position: relative;
+    background-size: cover;
+    transition: all 1s linear;
+    background-repeat: no-repeat;
+    background-position: 0px -200px;
+    background-image: url(../img/bg.webp);
 }
-.bg-img{
-    height: 100vh;
+
+body::before{
+    top: 0px;
+    left: 0px;
+    z-index: 0;
+    content: '';
     width: 100%;
-    object-fit: cover;
-    opacity: 40%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1;
+    height: 100%;
+    position: absolute;
+    background: rgba(255, 255, 255, 0.4);
 }
 
 section{
@@ -50,7 +61,7 @@ section{
     margin: auto;
     /* min-height: 110vh; */
     overflow: hidden;
-    gap: 100px;
+    gap: 0px;
 }
 .text-section {
     max-width: 720px;
@@ -86,41 +97,71 @@ section{
     z-index: 5;
 }
 .hero-button, .quiz-button {
-    padding: 20px 48px 20px 24px;
+    padding: 24px 28px;
     /* margin-right: 10px; */
     border: none;
     background: #fff;
     cursor: pointer;
     border-radius: 12px;
-    font-size: 1rem;
+    font-size: 20px;
     width: 100%;
     flex: 1;
     display: flex;
     gap: 10px;
     align-items: center;
+    
 }
-.hero-button input[type=radio], .quiz-button input[type=radio]{
+
+.hero-button:hover {
+    color: white;
+    background-color: var(--primary);
+}
+
+.hero-button:hover svg path {
+    fill: white;
+}
+
+
+
+.hero-button .genderBtn{
     width: 24px;
     height: 24px;
+    border: 1px solid var(--dark);
+    border-radius: 50%;
+    align-self: center;
+}
+
+.hero-button:hover .genderBtn{
+    border-color: white;
+    background-color: white;
+}
+
+ .quiz-button input[type=radio]{
+    width: 24px;
+    height: 24px;
+}
+
+.quiz-button input[type=radio]:focus{
+    outline: none;
 }
 
 .hero-btn-text, .quiz-btn-text{
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 12px;
-    width: 100%;
+    gap: 25px;
+    width: 90%;
 }
 
 .hero-btn-text svg{
     width: auto;
-    height: 17px;
+    height: 25px;
 }
 
 .hero-btn-text span, .quiz-btn-text{
     text-align: center;
-    font-size: 16px;
-    line-height: 20px;
+    font-size: 20px;
+    line-height: 27px;
 }
 
 .hero-image-section {
@@ -178,10 +219,6 @@ section{
     width: 100%;
 }
 
-#qa{
-    display: none;
-}
-
 
 .quiz{
     width: 100%;
@@ -190,11 +227,11 @@ section{
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 200px 100px ;
+    padding: 100px ;
     width: 100%;
     max-width: 1920px;
     margin: auto;
-    /* min-height: 100vh; */
+    min-height: 100vh;
 }
 
 .quiz-card, .watch-card{
@@ -277,8 +314,9 @@ section{
 }
 
 .quiz-button:hover{
-    background-color: #e3e3e3;
+    background-color: #E9639F;
     transition: all 200ms linear;
+    color: white;
     
 }
 
@@ -353,7 +391,7 @@ section{
     margin: auto;
     padding: 50px 50px 0 90px;
     /* height: 100vh; */
-    /* min-height: 100%; */
+    min-height: 100vh;
 }
 
 .result-main{
@@ -407,6 +445,8 @@ section{
     margin-top: 50px;
     transform: translateX(120px);
     width: fit-content;
+    width: 210px;
+    height: 210px;
 }
 
 .circular-progress {
@@ -479,19 +519,42 @@ section{
     background-color: #3EB8E5;
     border-radius: 50%;
     position: absolute;
-    top: -5px;
+    top: -10px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
 }
 
+.circleblue{
+    width: 205px;
+    height: 205px;
+    background: none;
+    border: 5px solid #3EB8E5;
+    border-radius: 50%;
+    z-index: 3;
+    position: absolute;
+    top: -2.5px;
+    left: -2.5px;
+    transition: all 3s linear;
+}
+.animateRotate{
+    animation: rorate 3s linear;
+}
+@keyframes rorate {
+    0%{
+        transform: rotateZ(0);
+    }
+    100%{
+        transform: rotateZ(359deg);
+    }
+}
 
 .watch{
     width: 100%;
 }
 
 .watch-cont{
-    padding-block: 200px;
+    padding-block: 100px;
     align-items: flex-start;
     min-height: 100vh;
 }
@@ -538,7 +601,26 @@ section{
     cursor: pointer;
 }
 
+.main{
+    position: relative;
+    /* top: 0; */
+    /* height: 100vh; */
+    /* overflow-y: auto; */
+    transition: all 1s ease-in-out;
+}
+.hero, .quiz, .result, .watch{
+    transition: all 1s ease-in-out;
 
+}
+.quiz, .result, .watch{
+    transition: all 1s ease-in-out;
+    /* top: 0; */
+}
+
+.hide{
+    margin-top: -110vh;
+    transition: all 1s ease-in-out;
+}
 footer{
     width: 100%;
     background-color: white;
